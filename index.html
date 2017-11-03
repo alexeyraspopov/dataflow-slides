@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ru">
+<head>
+	<title>Data Flow: Rethinking Good Practices</title>
+
+	<meta charset="utf-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400i,700,700i">
+	<link rel="stylesheet" href="FiraCode/distr/fira_code.css">
+	<link rel="stylesheet" href="node_modules/shower-ribbon/styles/screen-16x10.css">
+	<link rel="stylesheet" href="modules/custom.css">
+</head>
+<body class="shower list">
+	<header class="caption">
+		<h1>Data Flow: Rethinking Good Practices</h1>
+		<p><a href="http://alexeyraspopov.github.io/">Alexey Raspopov</a>, DataRobot.</p>
+	</header>
+
+	<section class="slide">
+		<h2 class="title">Дата Флоу: <br>ресинкинг гуд <em class="accent">практисес</em></h2>
+	</section>
+
+	<section class="slide">
+		<ul>
+			<li>Создаю разные штуки в <a href="https://datarobot.com">DataRobot</a></li>
+			<li>Делаю <a href="https://github.com/alexeyraspopov">open source</a></li>
+		</ul>
+	</section>
+
+	<section class="slide darkside">
+		<h2 class="title emoji">❤️ <span class="accent-3">JS</span></h2>
+	</section>
+
+	<section class="slide">
+		<h2>Где мы?</h2>
+
+		<ul>
+			<li class="next">Больше не обсуждаем &laquo;HTML в <em class="accent">джаваскрипте</em>&raquo;</li>
+			<li class="next">Не тратим спринт на <em class="accent">настройку</em> Бабеля и Вебпака</li>
+			<li class="next"><em class="accent">Пишем тесты</em> разного уровня для покрытия важной функциональности</li>
+		</ul>
+	</section>
+
+	<section class="slide darkside">
+		<p>Мы прошли некоторый путь компромиссов и решений для задач, <em class="accent">которых больше нет</em>. Но мы продолжаем продвигать те самые решения, без какой-либо ретроспективы.</p>
+	</section>
+
+	<section class="slide darkside">
+		<ul>
+			<li>Как там с настройкой Hot Reload?</li>
+			<li>Server-side rendering? Удачи в поддержке</li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<ul>
+			<li>Забросили все другие имплементации Flux</li>
+			<li>Произошла подмена ценностей и идей</li>
+			<li>Начали упрощать что имеем</li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<p class="title">Видели <em class="accent">redux-zero</em>?</p>
+	</section>
+
+	<section class="slide darkside">
+		<p class="title">В redux нет <em class="accent">диспатчера</em>?</p>
+		<p class="title next">В redux-zero нет <em class="accent">редьюсеров</em> 😱</p>
+	</section>
+
+	<section class="slide">
+		<p>Важны не высокие абстракции, важен качественный <em class="accent">developer experience</em></p>
+	</section>
+
+	<section class="slide">
+		<p>Сколько нужно приложить усилий чтобы вывести на экран список сущностей, полученный через API?</p>
+	</section>
+
+	<section class="slide">
+		<ul>
+			<li>Кеширование</li>
+			<li>Процесс загрузки</li>
+			<li>Сообщение об ошибке</li>
+			<li>...?</li>
+		</ul>
+	</section>
+
+	<section class="slide blueprint">
+		<pre>
+			<code>class User extends Record {</code>
+			<code>  id: string = '';</code>
+			<code>  name: string = '';</code>
+			<code>  age: number = 0;</code>
+			<code>&nbsp;</code>
+			<code>  isAdult() { return this.age >= 18; }</code>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide darkside">
+		<p class="title"><a href="https://dataclass.js.org/" style="color: #1E88E5;">dataclass.js.org</a></p>
+		<p><code>npm install <span class="accent">dataclass</span></code></p>
+	</section>
+
+	<section class="slide blueprint">
+		<pre>
+			<code>const user = new User({ ... });</code>
+			<code>const user2 = user.<span class="accent-2">copy</span>({ name: '...' });</code>
+			<code>user.<span class="accent-2">equals</span>(user2);</code>
+		</pre>
+	</section>
+
+	<section class="slide blueprint">
+		<pre>
+			<code>class Users {</code>
+			<code>  async create(data: Object): User;</code>
+			<code>  async retrieve(query): List&lt;User&gt;;</code>
+			<code>  async update(user: User): User;</code>
+			<code>  async destroy(user: User): void;</code>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide blueprint">
+		<pre>
+			<code>class UserListStore {</code>
+			<code>  getUsers() { <span class="accent-2">...</span> }</code>
+			<code>  async fetchUsers() { <span class="accent-2">...</span> }</code>
+			<code>  async changeUserName(user) { <span class="accent-2">...</span> }</code>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide blueprint">
+		<pre style="font-size: 0.9em;">
+			<code>class UserListContainer extends Component {</code>
+			<div class="next">
+				<code>  constructor(props) {</code>
+				<code>    super(props);</code>
+				<code>    const users = UserListStore.getUsers();</code>
+				<code>    this.state = { users, isLoading: users.isEmpty() };</code>
+				<code>  }</code>
+				<code>&nbsp;</code>
+			</div>
+			<div class="next">
+				<code>  componentDidMount() {</code>
+				<div class="next">
+					<code>    UserListStore.subscribe(users =></code>
+					<code>      this.setState({ users, isLoading: false }));</code>
+				</div>
+				<div class="next">
+					<code>    if (this.state.users.isEmpty())</code>
+					<code>      UserListStore.fetchUsers();</code>
+				</div>
+				<code>  }</code>
+			</div>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<ul>
+			<li>Начните работу со слоя данных, не отображения</li>
+			<li class="next">Экшны — не основа однонаправленного потока данных</li>
+			<li class="next">Отображение получает данные синхронно; API и сервисы работают асинхронно</li>
+		</ul>
+	</section>
+
+	<section class="slide darkside" id="contacts">
+		<h2>Лайк, шейр, сабскрайб</h2>
+
+		<ul>
+			<li><a href="https://twitter.com/alexeyraspopov">twitter.com/<span class="accent">alexeyraspopov</span></a></li>
+			<li><a href="https://github.com/alexeyraspopov">github.com/<span class="accent">alexeyraspopov</span></a></li>
+		</ul>
+
+		<p><a href="https://alexeyraspopov.github.io/dataflow-slides">alexeyraspopov.github.io/dataflow-slides</a></p>
+	</section>
+
+	<script src="node_modules/shower-core/shower.min.js"></script>
+	<script src="modules/highlight.js"></script>
+</body>
+</html>

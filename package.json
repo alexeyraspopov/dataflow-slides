@@ -1,0 +1,10 @@
+{
+  "name": "dataflow-slides",
+  "description": "Data Flow: Rethinking Good Practices",
+  "author": "Alexey Raspopov",
+  "license": "MIT",
+  "dependencies": {
+    "shower-core": "^2.1.0",
+    "shower-ribbon": "^2.1.0"
+  }
+}
